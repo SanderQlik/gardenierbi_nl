@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slimme Garagetoegang</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --paars: #654d6f;
+    --paars-licht: #f3eef6;
+    --paars-donker: #3d2e43;
+    --roze: #ac4a85;
+    --roze-licht: #faeef6;
+    --tekst: #1a1a1a;
+    --tekst-licht: #555;
+    --rand: #e0d8e4;
+    --wit: #ffffff;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--tekst); background: var(--wit); line-height: 1.6; }
+  .hero { background: linear-gradient(135deg, var(--paars-donker) 0%, var(--paars) 60%, var(--roze) 100%); color: white; padding: 80px 20px 100px; text-align: center; }
+  .hero-badge { display: inline-block; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 6px 18px; font-size: 13px; letter-spacing: 0.5px; margin-bottom: 24px; text-transform: uppercase; }
+  .hero h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 700; margin-bottom: 16px; line-height: 1.2; }
+  .hero p { font-size: clamp(16px, 2.5vw, 20px); opacity: 0.88; max-width: 560px; margin: 0 auto 36px; }
+  .hero-cta { display: inline-block; background: white; color: var(--paars-donker); padding: 16px 36px; border-radius: 50px; font-size: 16px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+  .sectie { padding: 72px 0; }
+  .sectie-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--roze); margin-bottom: 10px; }
+  .sectie h2 { font-size: clamp(22px, 4vw, 32px); font-weight: 700; color: var(--paars-donker); margin-bottom: 16px; line-height: 1.25; }
+  .sectie-intro { font-size: 17px; color: var(--tekst-licht); max-width: 640px; margin-bottom: 48px; }
+  .stappen { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-top: 40px; }
+  .stap { background: var(--paars-licht); border-radius: 16px; padding: 28px 24px; }
+  .stap-nr { width: 40px; height: 40px; background: var(--paars); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; margin-bottom: 16px; }
+  .stap h3 { font-size: 16px; font-weight: 600; color: var(--paars-donker); margin-bottom: 8px; }
+  .stap p { font-size: 14px; color: var(--tekst-licht); line-height: 1.6; }
+  .voordelen { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+  .voordeel { display: flex; gap: 16px; align-items: flex-start; background: var(--wit); border: 1px solid var(--rand); border-radius: 14px; padding: 22px 20px; }
+  .voordeel-icon { width: 44px; height: 44px; background: var(--roze-licht); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .voordeel-icon svg { width: 22px; height: 22px; stroke: var(--roze); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .voordeel h3 { font-size: 15px; font-weight: 600; color: var(--paars-donker); margin-bottom: 4px; }
+  .voordeel p { font-size: 13px; color: var(--tekst-licht); line-height: 1.5; }
+  .vergelijking { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 560px) { .vergelijking { grid-template-columns: 1fr; } }
+  .vergelij-kaart { border-radius: 16px; padding: 28px 24px; border: 1.5px solid var(--rand); }
+  .vergelij-kaart.aanbevolen { border-color: var(--paars); background: var(--paars-licht); }
+  .vergelij-kaart h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--paars-donker); }
+  .vergelij-badge { display: inline-block; background: var(--paars); color: white; font-size: 11px; padding: 3px 10px; border-radius: 10px; margin-bottom: 14px; font-weight: 600; }
+  .vergelij-rij { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; font-size: 14px; color: var(--tekst); }
+  .check { color: #22a55a; font-size: 16px; flex-shrink: 0; }
+  .kruis { color: #e24b4a; font-size: 16px; flex-shrink: 0; }
+  .tarief-kaart { background: linear-gradient(135deg, var(--paars) 0%, var(--roze) 100%); border-radius: 24px; padding: 48px 40px; color: white; text-align: center; max-width: 480px; margin: 0 auto; }
+  .tarief-kaart h3 { font-size: 18px; opacity: 0.85; margin-bottom: 8px; font-weight: 400; }
+  .prijs-groot { font-size: 64px; font-weight: 800; line-height: 1; margin-bottom: 4px; letter-spacing: -2px; }
+  .prijs-sub { font-size: 16px; opacity: 0.75; margin-bottom: 32px; }
+
+  /* TELEFOON INSTRUCTIE */
+  .telefoon-tabs { display: flex; gap: 8px; margin-bottom: 32px; }
+  .tab-btn { padding: 10px 20px; border-radius: 50px; border: 2px solid var(--rand); background: white; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--tekst-licht); transition: all 0.2s; }
+  .tab-btn.actief { background: var(--paars); border-color: var(--paars); color: white; }
+  .tab-inhoud { display: none; }
+  .tab-inhoud.actief { display: block; }
+  .instructie-lijst { list-style: none; counter-reset: stap; }
+  .instructie-lijst li { counter-increment: stap; display: flex; gap: 16px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--rand); font-size: 15px; }
+  .instructie-lijst li:last-child { border-bottom: none; }
+  .instructie-lijst li::before { content: counter(stap); min-width: 28px; height: 28px; background: var(--paars); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .tip-box { background: var(--paars-licht); border-left: 3px solid var(--paars); border-radius: 0 8px 8px 0; padding: 14px 16px; margin-top: 20px; font-size: 14px; color: var(--paars-donker); }
+
+
+  .tarief-lijst { list-style: none; text-align: left; margin-bottom: 36px; }
+  .tarief-lijst li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+  .tarief-lijst li:last-child { border-bottom: none; }
+  .tarief-bedrag { font-weight: 700; font-size: 16px; }
+  .betaal-knop { display: block; background: white; color: var(--paars-donker); padding: 16px; border-radius: 50px; font-size: 16px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .aanmeld-sectie { background: var(--paars-licht); border-radius: 24px; padding: 48px 40px; text-align: center; }
+  .aanmeld-sectie h2 { font-size: 26px; color: var(--paars-donker); margin-bottom: 12px; }
+  .aanmeld-sectie p { color: var(--tekst-licht); margin-bottom: 28px; font-size: 16px; }
+  .aanmeld-stappen { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+  .aanmeld-stap { background: white; border-radius: 12px; padding: 16px 20px; font-size: 14px; color: var(--paars-donker); font-weight: 500; border: 1px solid var(--rand); display: flex; align-items: center; gap: 10px; }
+  .aanmeld-nr { width: 26px; height: 26px; background: var(--paars); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .voorwaarden { background: #fafafa; border: 1px solid var(--rand); border-radius: 16px; padding: 32px 36px; }
+  .voorwaarden h3 { font-size: 17px; font-weight: 600; color: var(--paars-donker); margin-bottom: 16px; }
+  .voorwaarden ul { list-style: none; padding: 0; }
+  .voorwaarden ul li { padding: 10px 0; border-bottom: 1px solid var(--rand); font-size: 14px; color: var(--tekst-licht); display: flex; gap: 10px; align-items: flex-start; }
+  .voorwaarden ul li:last-child { border-bottom: none; }
+  .voorwaarden ul li::before { content: '\2192'; color: var(--paars); flex-shrink: 0; font-weight: 600; }
+  footer { background: var(--paars-donker); color: rgba(255,255,255,0.6); text-align: center; padding: 32px 20px; font-size: 13px; }
+  footer strong { color: white; }
+  footer a { color: rgba(255,255,255,0.8); }
+  .divider { border: none; border-top: 1px solid var(--rand); }
+  
+  .bevestiging-sectie { background: #f5f0f8; border-radius: 16px; padding: 32px; margin-top: 24px; display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+  .bevestiging-icon { font-size: 48px; flex-shrink: 0; }
+  .bevestiging-inhoud { flex: 1; min-width: 200px; }
+  .bevestiging-inhoud h3 { font-size: 20px; font-weight: 700; color: var(--paars-donker); margin-bottom: 10px; }
+  .bevestiging-inhoud p { font-size: 15px; color: var(--tekst-licht); line-height: 1.7; margin-bottom: 14px; }
+  .bevestiging-code { display: inline-flex; align-items: center; gap: 10px; background: var(--paars); color: white; padding: 10px 18px; border-radius: 8px; font-family: monospace; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+  .bevestiging-code small { font-family: sans-serif; font-size: 11px; font-weight: 400; opacity: 0.8; display: block; margin-top: 2px; }
+  
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">Slimme garagetoegang</div>
+    <h1>Altijd toegang tot de garage.<br>Ook zonder handzender.</h1>
+    <p>Bel één nummer met je eigen telefoon en de garagedeur gaat open. Geen app, geen zender — gewoon bellen.</p>
+	<a href="aanmelden.html" class="hero-cta">Aanmelden &rarr;</a>
+  </div>
+</section>
+
+<section class="sectie">
+  <div class="container">
+    <div class="sectie-label">Hoe werkt het</div>
+    <h2>Drie seconden en je bent binnen</h2>
+    <p class="sectie-intro">Het systeem werkt volledig via je mobiele telefoon. Geen installatie, geen account aanmaken — gewoon bellen vanuit je eigen telefoon.</p>
+    <div class="stappen">
+      <div class="stap">
+        <div class="stap-nr">1</div>
+        <h3>Bel het garagenummer</h3>
+        <p>Bel het vaste nummer van de garage vanuit je eigen telefoon. Het systeem herkent jouw nummer automatisch.</p>
+      </div>
+      <div class="stap">
+        <div class="stap-nr">2</div>
+        <h3>Systeem controleert</h3>
+        <p>Jouw nummer wordt direct gecontroleerd. Staat het geregistreerd en is de toegang actief? Dan gaat de deur open.</p>
+      </div>
+      <div class="stap">
+        <div class="stap-nr">3</div>
+        <h3>Deur gaat open</h3>
+        <p>Het systeem neemt het gesprek niet aan — bellen is gratis voor jou. Na de 1e keer overgaan gaat de garagedeur direct open.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="sectie">
+  <div class="container">
+    <div class="sectie-label">Voordelen</div>
+    <h2>Herkenbaar? Jouw handzender schiet tekort</h2>
+    <p class="sectie-intro">Een handzender is handig — maar lang niet altijd beschikbaar. Dit systeem is de ideale aanvulling voor alle momenten dat je handzender er niet bij is.</p>
+    <div class="voordelen">
+      <div class="voordeel">
+        <div class="voordeel-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div>
+          <h3>Handzender ligt in de auto</h3>
+          <p>Ga je met de fiets, motor of een andere auto? Dan heb je geen toegang. Met dit systeem bel je gewoon.</p>
+        </div>
+      </div>
+      <div class="voordeel">
+        <div class="voordeel-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div>
+          <h3>Eén handzender voor het gezin</h3>
+          <p>Elk gezinslid met een telefoon heeft nu zelfstandig toegang. Ideaal voor kinderen, partners en andere huisgenoten.</p>
+        </div>
+      </div>
+      <div class="voordeel">
+        <div class="voordeel-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div>
+        <div>
+          <h3>Iemand even binnenlaten</h3>
+          <p>Wil je iemand toegang geven zonder dat je zelf naar de garage hoeft te gaan? Bel vanuit je huis de deur open.</p>
+        </div>
+      </div>
+      <div class="voordeel">
+        <div class="voordeel-icon"><svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></div>
+        <div>
+          <h3>Handzender stuk of leeg</h3>
+          <p>Batterij leeg of handzender defect? Je hebt altijd een betrouwbare reserve via je telefoon.</p>
+        </div>
+      </div>
+      <div class="voordeel">
+        <div class="voordeel-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div>
+          <h3>Maximum handzenders bereikt</h3>
+          <p>Eigenaren mogen max. 2 handzenders hebben. Dit systeem telt daar niet bij mee.</p>
+        </div>
+      </div>
+      <div class="voordeel">
+        <div class="voordeel-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div>
+          <h3>Snel een oplossing nodig</h3>
+          <p>Je hebt snel een alternatief nodig voor het kunnen openen van de garagedeur? Binnen 24 uur geregeld.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="sectie">
+  <div class="container">
+    <div class="sectie-label">Vergelijking</div>
+    <h2>Handzender vs. slim belsysteem</h2>
+    <p class="sectie-intro">Dit systeem vervangt je handzender niet — het is de perfecte aanvulling voor alle momenten dat je handzender er niet bij is.</p>
+    <div class="vergelijking">
+      <div class="vergelij-kaart">
+        <h3>Handzender alleen</h3>
+        <div class="vergelij-rij"><span class="check">✓</span><span>Werkt altijd wanneer je hem bij je hebt</span></div>
+        <div class="vergelij-rij"><span class="kruis">✗</span><span>Ligt in de auto — niet handig op de fiets of motor</span></div>
+        <div class="vergelij-rij"><span class="kruis">✗</span><span>Gezinsleden zonder eigen zender staan voor gesloten deur</span></div>
+        <div class="vergelij-rij"><span class="kruis">✗</span><span>Bij verlies of defect geen reserve</span></div>
+        <div class="vergelij-rij"><span class="kruis">✗</span><span>Maximum aantal per stallingsplaats bereikt</span></div>
+        <div class="vergelij-rij"><span class="kruis">✗</span><span>Tijdelijke toegang geven niet mogelijk</span></div>
+      </div>
+      <div class="vergelij-kaart aanbevolen">
+        <h3>Handzender + belsysteem</h3>
+        <span class="vergelij-badge">Aanbevolen</span>
+        <div class="vergelij-rij"><span class="check">✓</span><span>Altijd toegang via je telefoon</span></div>
+        <div class="vergelij-rij"><span class="check">✓</span><span>Werkt ook op de fiets, motor of met andere auto</span></div>
+        <div class="vergelij-rij"><span class="check">✓</span><span>Elk gezinslid met een telefoon heeft toegang</span></div>
+        <div class="vergelij-rij"><span class="check">✓</span><span>Handzender stuk of leeg? Je belt gewoon</span></div>
+        <div class="vergelij-rij"><span class="check">✓</span><span>Telt niet mee voor het maximum aantal zenders</span></div>
+        <div class="vergelij-rij"><span class="check">✓</span><span>Tijdelijke toegang eenvoudig in te stellen</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- TELEFOON KNOP INSTRUCTIE -->
+<section class="sectie">
+  <div class="container">
+    <div class="sectie-label">Handige tip</div>
+    <h2>Zet een knop op uw beginscherm</h2>
+    <p class="sectie-intro">Met één tik uw garagedeur openen — zonder het nummer te hoeven zoeken of intoetsen.</p>
+
+    <div class="telefoon-tabs">
+      <button class="tab-btn actief" onclick="toonTab('android', this)">Android</button>
+      <button class="tab-btn" onclick="toonTab('iphone', this)">iPhone</button>
+    </div>
+
+    <div id="tab-android" class="tab-inhoud actief">
+      <ol class="instructie-lijst">
+        <li>Open de Telefoon-app en ga naar Contacten</li>
+        <li>Zoek het contact van de garage op en open het</li>
+        <li>Tik op de drie puntjes (⋮) rechtsboven</li>
+        <li>Kies <strong>Toevoegen aan beginscherm</strong></li>
+        <li>Geef het een herkenbare naam (bijv. "Garage openen")</li>
+        <li>Tik op <strong>Toevoegen</strong></li>
+      </ol>
+      <div class="tip-box">
+        💡 Op sommige Android-toestellen heet de optie <em>Snelkoppeling maken</em> of <em>Op startscherm plaatsen</em>. De stappen kunnen per fabrikant iets verschillen.
+      </div>
+    </div>
+
+    <div id="tab-iphone" class="tab-inhoud">
+      <ol class="instructie-lijst">
+        <li>Open de app <strong>Opdrachten</strong> (Shortcuts)</li>
+        <li>Tik rechtsboven op <strong>+</strong></li>
+        <li>Tik op <strong>Voeg taak toe</strong></li>
+        <li>Zoek naar <strong>Bel</strong></li>
+        <li>Kies <strong>Bel contact</strong></li>
+        <li>Selecteer het telefoonnummer van de garage</li>
+        <li>Tik bovenaan op de naam van de opdracht en geef deze een herkenbare naam (bijv. "Garage openen")</li>
+        <li>Tik op <strong>Zet op beginscherm</strong></li>
+        <li>Tik op <strong>Voeg toe</strong></li>
+      </ol>
+      <div class="tip-box">
+        💡 Op sommige iPhones verschijnt nog een extra bevestiging "Wil je bellen?" — dat is normaal gedrag van iOS.
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="sectie">
+  <div class="container">
+    <div class="bevestiging-sectie">
+      <div class="bevestiging-icon">📳</div>
+      <div class="bevestiging-inhoud">
+        <h3>Optioneel: bevestigingstoon</h3>
+        <p>
+          Standaard neemt het systeem niet op zodra u naar de garagedeur belt, na 1 keer overgaan kunt u zelf de oproep beëindigen — bellen blijft gratis.
+          Wilt u een korte toon horen als bevestiging dat de deur is geopend?
+          Dat kan eenvoudig worden ingeschakeld door één SMS te sturen.
+        </p>
+        <p>
+          Uw oproep naar de garagedeur wordt dan automatisch opgenomen, u hoort een korte toon en vervolgens wordt het gesprek
+          door het systeem beëindigd. <strong>Het gesprek duurt enkele seconden</strong>
+          — afhankelijk van uw abonnement kunnen hier gesprekskosten voor gelden.
+        </p>
+        <div class="bevestiging-code">
+          BEVESTIGING AAN
+        </div>
+		<small>stuur dit naar het garagenummer om deze functionaliteit te activeren</small>
+        &nbsp;
+        <div class="bevestiging-code" style="background:#888; margin-top:8px;">
+          BEVESTIGING UIT    
+        </div>
+		<small>om deze functionaliteit weer uit te schakelen</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="sectie">
+  <div class="container">
+    <div class="sectie-label" style="text-align:center">Tarief</div>
+    <h2 style="text-align:center">Eenvoudig en transparant</h2>
+    <p class="sectie-intro" style="text-align:center;margin:0 auto 40px;">Geen verborgen kosten. Geen ingewikkelde contracten.</p>
+    <div class="tarief-kaart">
+      <h3>Per telefoonnummer</h3>
+      <div class="prijs-groot">&#8364;1</div>
+      <div class="prijs-sub">per maand</div>
+      <ul class="tarief-lijst">
+        <li><span>Eenmalige aansluitfee</span><span class="tarief-bedrag">&#8364;15</span></li>
+        <li><span>Abonnement per jaar</span><span class="tarief-bedrag">&#8364;12</span></li>
+        <li><span>Totaal eerste jaar</span><span class="tarief-bedrag">&#8364;27</span></li>
+        <li><span>Daarna per jaar</span><span class="tarief-bedrag">&#8364;12</span></li>
+        <li><span>Nummerwisseling</span><span class="tarief-bedrag">&#8364;5</span></li>
+      </ul>
+      <a href="aanmelden.html" class="betaal-knop">Nu aanmelden &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="sectie">
+  <div class="container">
+    <div class="sectie-label">Gebruiksvoorwaarden</div>
+    <h2>Spelregels blijven gelijk</h2>
+    <p class="sectie-intro">Toegang via dit systeem betekent geen wijziging in de bestaande regels van de garage. De volgende voorwaarden gelden onverkort.</p>
+    <details>
+    <summary style="cursor:pointer;font-size:16px;font-weight:600;color:var(--paars-donker);padding:16px;background:#fafafa;border:1px solid var(--rand);border-radius:12px;list-style:none;display:flex;justify-content:space-between;align-items:center;">Lees de volledige gebruiksvoorwaarden <span style="font-size:20px;color:var(--roze);">+</span></summary>
+    <div class="voorwaarden" style="border-top:none;border-radius:0 0 12px 12px;">
+      <h3>Artikel 1 &mdash; Toegang en gebruik</h3>
+      <ul>
+        <li>Toegang via het belsysteem is strikt persoonlijk en gekoppeld aan &eacute;&eacute;n telefoonnummer per registratie. Elk telefoonnummer dient afzonderlijk geregistreerd en betaald te worden.</li>
+        <li>Het is niet toegestaan het geregistreerde telefoonnummer ter beschikking te stellen aan derden voor gebruik van dit systeem.</li>
+        <li>Toegang is uitsluitend voorbehouden aan bewoners van het complex en houders van een stallingsplaats in de garage.</li>
+        <li>Het systeem is een aanvulling op de bestaande toegangsmiddelen. De overige regels van het complex blijven ongewijzigd van kracht.</li>
+        <li>De beheerder behoudt zich het recht voor om toegang te weigeren of in te trekken zonder opgaaf van redenen.</li>
+      </ul>
+      <h3 style="margin-top:16px;">Artikel 2 &mdash; Parkeergedrag en gebruik van de garage</h3>
+      <ul>
+        <li>Voertuigen worden uitsluitend geparkeerd op de eigen aangewezen stallingsplaats.</li>
+        <li>Parkeren buiten de eigen stallingsplaats, buiten de aangegeven parkeervakken, of op plaatsen die niet voor parkeren zijn bestemd, is ten strengste verboden.</li>
+        <li>De rijroutes en doorrijhoogtes in de garage worden te allen tijde vrijgehouden.</li>
+        <li>Overlastgevend rijgedrag in de garage is niet toegestaan.</li>
+      </ul>
+      <h3 style="margin-top:16px;">Artikel 3 &mdash; Sanctiebeleid</h3>
+      <ul>
+        <li>Eerste overtreding: schriftelijke waarschuwing per SMS &mdash; geen kosten.</li>
+        <li>Tweede overtreding: tijdelijke blokkering toegang &mdash; deblokkering op verzoek voor &euro;25.</li>
+        <li>Derde overtreding: permanente blokkering &mdash; deblokkering op verzoek voor &euro;50.</li>
+        <li>Ernstige overtreding: directe permanente blokkering zonder restitutie van betaald abonnementsgeld.</li>
+        <li>Deblokkering geschiedt uitsluitend op schriftelijk verzoek via garagedeur@gardenierbi.nl en na voldoening van de verschuldigde kosten.</li>
+      </ul>
+      <h3 style="margin-top:16px;">Artikel 4 &mdash; Beëindiging</h3>
+      <ul>
+        <li>Bij vertrek uit het complex of beëindiging van de huurovereenkomst vervalt de toegang automatisch per die datum.</li>
+        <li>De rechthebbende is verplicht vertrek of beëindiging minimaal twee weken vooraf te melden via garagedeur@gardenierbi.nl.</li>
+        <li>Reeds betaald abonnementsgeld wordt niet gerestitueerd bij voortijdige beëindiging.</li>
+      </ul>
+      <h3 style="margin-top:16px;">Artikel 5 &mdash; Beschikbaarheid en storingen</h3>
+      <ul>
+        <li>Dit systeem is nieuw en wordt voor het eerst in gebruik genomen. De beheerder kan niet garanderen dat het systeem te allen tijde zonder storingen beschikbaar is.</li>
+        <li>Gebruikers wordt geadviseerd altijd een alternatief toegangsmiddel zoals een handzender beschikbaar te houden.</li>
+      </ul>
+      <p style="margin-top:16px;font-size:13px;color:var(--tekst-licht)"><a href="voorwaarden.html" style="color:var(--paars)">Lees de volledige voorwaarden inclusief verlengingsbeleid en sanctietabel &rarr;</a></p>
+    </div>
+    </details>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="sectie" id="aanmelden">
+  <div class="container">
+    <div class="aanmeld-sectie">
+      <div class="sectie-label" style="text-align:center">Aanmelden</div>
+      <h2>Klaar om te beginnen?</h2>
+      <p>Betaal via iDEAL en vermeld uw gegevens. Na verwerking van uw aanmelding is uw toegang binnen één werkdag actief.</p>
+      <div class="aanmeld-stappen">
+        <div class="aanmeld-stap"><div class="aanmeld-nr">1</div>Betaal via iDEAL</div>
+        <div class="aanmeld-stap"><div class="aanmeld-nr">2</div>Vermeld naam, adres en telefoonnummer</div>
+        <div class="aanmeld-stap"><div class="aanmeld-nr">3</div>Ontvang bevestiging per SMS na verwerking (&lt;24u)</div>
+        <div class="aanmeld-stap"><div class="aanmeld-nr">4</div>Direct toegang</div>
+      </div>
+      <a href="aanmelden.html" style="display:inline-block;background:var(--paars);color:white;padding:16px 40px;border-radius:50px;font-size:16px;font-weight:700;text-decoration:none;margin-bottom:12px;">
+        Aanmelden &rarr;
+      </a>
+	  
+      <p style="font-size:13px;color:#999;">Vermeld bij de betaling uw naam, adres en telefoonnummer. Toegang wordt geactiveerd na ontvangst van de betaling.</p>
+	  <p style="font-size:12px;color:#999;">Door te betalen gaat u akkoord met de <a href="voorwaarden.html" style="color:var(--paars)">algemene voorwaarden</a>.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Slimme Garagetoegang</strong> &mdash; Beheerd door Sander</p>
+  <p style="margin-top:8px;"><a href="mailto:garagedeur@gardenierbi.nl">garagedeur@gardenierbi.nl</a></p>
+</footer>
+
+<script>
+function toonTab(id, btn) {
+  document.querySelectorAll('.tab-inhoud').forEach(t => t.classList.remove('actief'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('actief'));
+  document.getElementById('tab-' + id).classList.add('actief');
+  btn.classList.add('actief');
+}
+</script>
+
+</body>
+</html>
